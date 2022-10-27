@@ -1,0 +1,210 @@
+﻿@{
+	Layout="~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+	<div class=row>
+		<div class="col-1" style="min-width:180px; position: relative; top: 7px; left: 360px;">
+			<label><b>Select Priority Level</b></label>
+		</div>
+		<div class="col-2">
+			<select id="PriorityLevel" class="form-control" style="width:100px; position: relative; top: 0px; left: 400px">
+				<option selected>Critical</option>
+				<option>High</option>
+				<option>Moderate</option>
+				<option>Low</option>
+			</select>
+		</div>
+		<div class="col-4">
+			<input id="ID" value="Show Graph" type="button" style="min-width:100px; position: relative; top: 5px; left: 360px" />
+		</div>
+	</div>
+</p>
+
+<br />
+<div id="ChartView">
+	<canvas id="myChart" ></canvas>
+</div>
+<div id="ChartView2">
+	<canvas id="myChart2" ></canvas>
+</div>
+<div id="ChartView3">
+	<canvas id="myChart3" ></canvas>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+	$(function () {
+		$('#ID').click(function() {
+
+			var priorityLevel = $("#PriorityLevel").val();
+
+
+			var chartView = document.getElementById('ChartView');
+			var chartView2 = document.getElementById('ChartView2');
+			var chartView3 = document.getElementById('ChartView3');
+
+			chartView.innerHTML = '&nbsp;';
+			$('#ChartView').append('<canvas id="myChart" style="max-width:500px;max-height:450px; position: relative; bottom: 50px; right: 0px;"></canvas>');
+			chartView2.innerHTML = '&nbsp;';
+			$('#ChartView2').append('<canvas id="myChart2" style="max-width:250px;max-height:250px; position: relative; bottom: 50px; left: 500px"></canvas>');
+			chartView3.innerHTML = '&nbsp;';
+			$('#ChartView3').append('<canvas id="myChart3" style="max-width:520px;max-height:470px; position: relative; bottom: 800px; left: 750px"></canvas>');
+			
+
+			$.ajax({
+				type: "POST",
+				url: "/LocFreq/FetchData",
+				data: "",
+				contextType: "application/json; charset=uft-8",
+				dataType: "json",
+				success: OnSuccessResult,
+				error: OnError
+			});
+
+			function OnSuccessResult (data){
+
+				if (priorityLevel == 'Critical') {
+					var _locationLabels = data[0];
+					var _locationData = data[1];
+					var _stateLabels = data[8];
+					var _stateData = data[9];
+					var _groupLabels = data[16];
+					var _groupData = data[17];
+				}
+				else if (priorityLevel == 'High') {
+					var _locationLabels = data[2];
+					var _locationData = data[3];
+					var _stateLabels = data[10];
+					var _stateData = data[11];
+					var _groupLabels = data[18];
+					var _groupData = data[19];
+				}
+				else if (priorityLevel == 'Moderate') {
+					var _locationLabels = data[4];
+					var _locationData = data[5];
+					var _stateLabels = data[12];
+					var _stateData = data[13];
+					var _groupLabels = data[20];
+					var _groupData = data[21];
+				}
+				else if (priorityLevel == 'Low') {
+					var _locationLabels = data[6];
+					var _locationData = data[7];
+					var _stateLabels = data[14];
+					var _stateData = data[15];
+					var _groupLabels = data[22];
+					var _groupData = data[23];
+				}
+
+				new Chart("myChart",
+				{
+
+					type: "bar",
+					data: {
+						labels: _locationLabels,
+						datasets: [{
+								backgroundColor: ['#FF0000', '#FF3232', '#FF6262', '#FF8585', '#FFA0A0', '#FFAFAF', '#FFC3C3', '#FFD1D1', '#FAD9D9', '#FEEAEA'],
+								data: _locationData
+						}]
+					},
+					options: {
+						plugins: {
+							legend: {
+								display: false
+							},
+								title: {
+									display: true,
+									text: 'Incidents by Location'
+								}
+						},
+						scales: {
+							y: {
+								title: {
+									display: true,
+									text: 'Number of Incidents'
+								}
+							},
+							x: {
+								title: {
+									display: true,
+									text: 'Cities'
+								}
+							}
+						}
+					}
+				});
+
+				new Chart("myChart2",
+					{
+						type: "pie",
+						data: {
+							labels: _stateLabels,
+							datasets: [{
+								backgroundColor: ['#0084DE', '#2CA9FF', '#54B9FF', '#77C8FF', '#9AD6FF', '#B2E0FF', '#C7E7FD', '#E4F4FF'],
+								data: _stateData
+							}]
+						},
+						options: {
+							plugins: {
+								legend: {
+									position: "right"
+								},
+								title: {
+									display: true,
+									text: 'Incident States'
+								}
+							}
+						}
+					}
+				);
+				new Chart("myChart3",
+					{
+
+						type: "bar",
+						data: {
+							labels: _groupLabels,
+							datasets: [{
+								backgroundColor: ['#008631', '#00ab41', '#00c04b', '#1fd655', '#39e75f', '#5ced73', '#83f28f', '#abf7b1', '#cefad0', '#E6FFE7'],
+								data: _groupData
+							}]
+						},
+						options: {
+							plugins: {
+								legend: {
+									display: false
+								},
+								title: {
+									display: true,
+									text: 'Mean Time To Resolution'
+								}
+							},
+							scales: {
+								y: {
+									title: {
+										display: true,
+										text: 'Minutes'
+									}
+								},
+								x: {
+									title: {
+										display: true,
+										text: 'Groups'
+									}
+								}
+							}
+						}
+					}
+				);
+			}
+
+			function OnError (err) {
+				console.log(err)
+			}
+
+		});
+	});
+</script>
