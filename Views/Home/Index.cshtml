@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    string[] TableHeaders = new string[] {"Number"
+      ,"Incident State"
+      ,"Active"
+      ,"Opened By"
+      ,"Opened At"
+      ,"Location"
+      ,"Category"
+      ,"Impact"
+      ,"Priority"
+      ,"Assignment Group"
+      ,"Resolved By"
+      ,"Resolved At"
+      ,"Closed At"};
+}
+
+<h1>Incidents</h1>
+
+<div class="table">
+    <table>
+        <thead>
+            <tr>
+                @{
+                    foreach (var head in TableHeaders)
+                    {
+                        <th>
+                            @head
+                        </th>
+                    }
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model != null)
+                {
+                    foreach (var Data in Model)
+                    {
+                        <tr style="border: none">
+                            <td>@Data.number</td>
+                            <td>@Data.incident_state</td>
+                            <td>@Data.active</td>
+                            <td>@Data.opened_by</td>
+                            <td>@Data.opened_at</td>
+                            <td>@Data.location</td>
+                            <td>@Data.category</td>
+                            <td>@Data.impact</td>
+                            <td>@Data.priority</td>
+                            <td>@Data.assignment_group</td>
+                            <td>@Data.resolved_by</td>
+                            <td>@Data.resolved_at</td>
+                            <td>@Data.closed_at</td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
